@@ -2,7 +2,7 @@
 FROM gradle:8.3-jdk17 AS build
 WORKDIR /app
 COPY . .
-RUN gradle clean build -x test
+RUN gradle clean build -x test --no-daemon --refresh-dependencies
 
 # 2. Run stage
 FROM eclipse-temurin:17-jdk
