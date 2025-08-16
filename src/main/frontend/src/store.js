@@ -5,6 +5,7 @@ let boardData = createSlice({
     initialState : {
         title: "",
         content: "",
+        tag: "",
         boardList: []
     },
     reducers: {
@@ -14,6 +15,9 @@ let boardData = createSlice({
         setBoardDetails: (state, action) => {
             state.title = action.payload.title;  // 수정
             state.content = action.payload.content;  // 수정
+        },
+        setTag: (state, action) => {
+            state.tag = action.payload.tag;
         }
     }
 });
@@ -26,6 +30,7 @@ let userData = createSlice({
         username: "",
         password: "",
         displayName: "",
+        profileImage: "",
         authorities: [],
         accountNonExpired: true,
         accountNonLocked: true,
@@ -40,6 +45,7 @@ let userData = createSlice({
                 username: action.payload.username,
                 password: action.payload.password,
                 displayName: action.payload.displayName,
+                profileImage: action.payload.profileImage,
                 authorities: action.payload.authorities,
                 accountNonExpired: action.payload.accountNonExpired,
                 accountNonLocked: action.payload.accountNonLocked,
@@ -52,6 +58,7 @@ let userData = createSlice({
             username: "",
             password: "",
             displayName: "",
+            profileImage: "",
             authorities: [],
             accountNonExpired: true,
             accountNonLocked: true,
@@ -62,9 +69,8 @@ let userData = createSlice({
     }
 });
 
-
 export let { setUser, resetUser } = userData.actions;
-export let { setBoard, setBoardDetails } = boardData.actions;
+export let { setBoard, setBoardDetails, setTag } = boardData.actions;
 
 const store = configureStore({
     reducer: {

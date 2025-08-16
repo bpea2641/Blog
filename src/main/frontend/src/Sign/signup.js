@@ -9,21 +9,27 @@ import Form from 'react-bootstrap/Form';
 
 
 function Join() {
-  let user = useSelector((state) => {
-    return state.user;
-  })
+//  let user = useSelector((state) => {
+//    return state.user;
+//  })
 
-  let dispatch = useDispatch();
+  const [formData, setFormData] = useState({
+    username: '',
+    displayName: '',
+    password: ''
+  });
+
+//  let dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    dispatch(setUser({ ...user, [id]: value }));
+    setFormData({ ...formData, [id]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/signup', user);  // 회원가입 요청 보내기
+      await axios.post('/signup', formData);  // 회원가입 요청 보내기
       alert('회원가입 완료');
       window.location.href = '/';  // 회원가입 후 홈으로 리디렉션
     } catch (error) {
@@ -45,7 +51,7 @@ function Join() {
                 <Form.Control
                   type="text"
                   id="username"
-                  value={user.username || ''}
+                  value={formData.username}
                   placeholder="이름"
                   onChange={handleChange}
                 />
@@ -55,7 +61,7 @@ function Join() {
                 <Form.Control
                   type="text"
                   id="displayName"
-                  value={user.displayName || ''}
+                  value={formData.displayName || ''}
                   placeholder="닉네임"
                   onChange={handleChange}
                 />
@@ -65,7 +71,7 @@ function Join() {
                 <Form.Control
                   type="password"
                   id="password"
-                  value={user.password || ''}
+                  value={formData.password || ''}
                   placeholder="비밀번호"
                   onChange={handleChange}
                 />

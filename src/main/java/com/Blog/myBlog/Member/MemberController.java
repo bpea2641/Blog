@@ -1,23 +1,24 @@
 package com.Blog.myBlog.Member;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class MemberController {
     private final MemberService memberService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<String> postMethodName(@RequestBody Member member) {
@@ -84,9 +86,76 @@ public class MemberController {
     public ResponseEntity<?> getUserInfo(Authentication auth) {
         if(auth != null) {
             CustomUser customUser = (CustomUser) auth.getPrincipal();
+            System.out.println(customUser.getProfileImage());
             return ResponseEntity.ok(customUser);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
     }
+
+    @PutMapping("/user/profile-image")
+    public ResponseEntity<?> updateProfileImage(
+            @RequestBody Map<String, String> body,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        Long memberId = customUser.getId();
+
+        Member member = memberRepository.findById(memberId).orElse(null);
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        String imagePath = body.get("profileImage");
+        if (imagePath != null && !imagePath.isEmpty()) {
+            member.setProfileImage(imagePath);
+            memberRepository.save(member);
+
+            // 새 CustomUser 객체 생성 (authorities 포함)
+            CustomUser updatedUser = new CustomUser(
+                member.getUsername(),
+                member.getPassword(),
+                List.of(new SimpleGrantedAuthority("일반유저")),  // 권한도 넣어주고
+                member.getDisplayName(),
+                member.getId(),
+                member.getProfileImage()
+            );
+
+            // 새로운 토큰 생성
+            String newToken = JwtUtil.createToken(
+                new UsernamePasswordAuthenticationToken(
+                    updatedUser,
+                    null,
+                    List.of(new SimpleGrantedAuthority("일반유저"))
+                )
+            );
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("user", updatedUser);  // 여기 CustomUser 넣기!
+            response.put("token", newToken);
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.badRequest().body("Invalid image path");
+    }
+
+    @GetMapping("/memberList")
+    public ResponseEntity<List<Map<String, Object>>> getAllMembers() {
+        List<Member> members = memberRepository.findAll();
+
+        List<Map<String, Object>> result = members.stream().map(m -> {
+            Map<String, Object> MemberInfo = new HashMap<>();
+            MemberInfo.put("id", m.getId());
+            MemberInfo.put("displayName", m.displayName);
+            MemberInfo.put("profileImage", m.profileImage);
+            return MemberInfo;
+        }).toList();
+
+        return ResponseEntity.ok(result);
+    }
+
 }

@@ -54,16 +54,26 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 //        claim.get("username").toString(); // jwt가 들어있음.
 
+        String profileImage = claim.get("profileImage") != null
+        ? claim.get("profileImage").toString()
+        : "/UserProfileImages/default.png";
+
         var arr = claim.get("authorities").toString().split(",");
         var authorities = Arrays.stream(arr)
                 .map(a -> new SimpleGrantedAuthority(a)).toList();
 
-        var customUser = new CustomUser(
-                claim.get("username").toString(),
-                "none",
-                authorities
-        );
-        customUser.displayName = claim.get("displayName").toString();
+                Long id = ((Number) claim.get("id")).longValue(); // ✅ 안전한 방식
+
+                CustomUser customUser = new CustomUser(
+                    claim.get("username").toString(),
+                    "none",
+                    authorities,
+                    claim.get("displayName").toString(),
+                    id,
+                    profileImage
+                );
+                
+        customUser.setDisplayName(claim.get("displayName").toString());
 
         var authToken = new UsernamePasswordAuthenticationToken(
                 customUser, "",

@@ -1,14 +1,9 @@
 package com.Blog.myBlog.Board;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -17,15 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +44,7 @@ public class BoardController {
             board.setTitle(boardDTO.getTitle());
             board.setContent(boardDTO.getContent());  // content에는 텍스트와 이미지 URL이 포함됨
             board.setCreator(boardDTO.getCreator());
+            board.setTag(boardDTO.getTag());
 
             // 게시글과 파일을 저장하는 서비스 호출
             boardService.saveBoard(board, files);
@@ -105,33 +97,47 @@ public class BoardController {
 
 
     @GetMapping("/board/list/page/{id}")
-    public ResponseEntity<Map<String, Object>> listBoardWithPagination(@PathVariable(name = "id") int id) {
+public ResponseEntity<Map<String, Object>> listBoardWithPagination(
+    @PathVariable(name = "id") int id,
+    @RequestParam(name = "tag", required = false) String tag) {  // tag 파라미터를 추가
+    try {
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(id, pageSize, Sort.by("id").descending());
+
+        // tag가 null이 아니면 해당 tag에 맞는 게시글을 찾고, null이면 모든 게시글을 가져옴
+        Page<Board> boardPage = (tag == null || tag.isEmpty()) 
+            ? boardRepository.findAll(pageable)
+            : boardRepository.findByTag(tag, pageable);  // tag로 필터링 추가
+
+        List<BoardDTO> boardDTOs = boardPage.getContent().stream()
+                .map(BoardDTO::new)
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("boardList", boardDTOs);
+        response.put("totalPages", boardPage.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>());
+    }
+}
+
+
+
+    @GetMapping("/board/list")
+    public ResponseEntity<List<BoardDTO>> getAllBoards() {
         try {
-            // 페이지 크기 설정 (예: 10개씩)
-            int pageSize = 10;
-
-            Pageable pageable = PageRequest.of(id, pageSize, Sort.by("id").descending()); // 페이지 번호, 페이지 크기 설정
-
-            // 페이징 처리된 Board 객체 가져오기
-            Page<Board> boardPage = boardRepository.findAll(pageable);
-
-            // Board 엔티티 리스트를 BoardDTO 리스트로 변환
-            List<BoardDTO> boardDTOs = boardPage.getContent().stream()
+            // 모든 게시판 가져오기
+            List<BoardDTO> boardDTOs = boardRepository.findAll().stream()
                     .map(BoardDTO::new)
                     .collect(Collectors.toList());
 
-            // 응답에 totalPages 포함
-            Map<String, Object> response = new HashMap<>();
-            response.put("boardList", boardDTOs);
-            response.put("totalPages", boardPage.getTotalPages()); // totalPages 추가
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(boardDTOs);
         } catch (Exception e) {
-            // 예외 발생 시 빈 리스트 반환
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
         }
     }
-
 
     @GetMapping("/board/detail/{id}")
     public ResponseEntity<?> detailBoard(@PathVariable(name = "id") Long id) {

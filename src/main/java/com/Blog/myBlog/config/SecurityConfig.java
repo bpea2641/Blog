@@ -27,19 +27,16 @@ import com.Blog.myBlog.Member.JwtFilter;
     //        return repository;
     //    } // csrf 키기
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http.csrf((csrf) -> csrf.disable());
-            http.sessionManagement((session) -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
-            http.addFilterBefore(new JwtFilter(), ExceptionTranslationFilter.class);
-            http.authorizeHttpRequests((authorize) ->
-                    authorize.requestMatchers("/**").permitAll()
-            );
-            http.logout(logout -> logout.logoutUrl("/logout"))
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
-            .cors(cors -> cors.disable());  // CORS 설정 추가            // multipart 관련 헤더 설정
-            return http.build();
-        }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable());
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(new JwtFilter(), ExceptionTranslationFilter.class);
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll());
+        http.logout(logout -> logout.logoutUrl("/logout"));
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+        http.cors();  // cors 설정 활성화 (disable() 대신)
+        return http.build();
+    }
+    
     }

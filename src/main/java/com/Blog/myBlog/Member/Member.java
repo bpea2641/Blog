@@ -24,4 +24,7 @@ public class Member {
 
     @Column
     public String displayName;
+
+    @Column(nullable = true)
+    public String profileImage;
 }

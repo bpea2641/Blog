@@ -28,13 +28,16 @@ public class JwtUtil {
 //      auth의 권한List를 가져와서 map으로 문자열로 바꾼다음 collect로 문자열의 , 제거.
 
         String jwt = Jwts.builder()
-                .claim("username", user.getUsername()) // 해당 claim에 함수에 데이터 넣는 것
-                .claim("displayName", user.getDisplayName()) // 해당 데이터는 누구나 볼 수 있기 때문에 민감한 정보는 제외
-                .claim("authorities", authorities) // 권한은 List로 되어있기 때문에 위에서처럼 문자열로 처리한다음에 넣는다.
-                .issuedAt(new Date(System.currentTimeMillis())) // jwt를 언제 발행했는지.
-                .expiration(new Date(System.currentTimeMillis() + 3600000)) //유효기간 10초, ms단위.
+                .claim("id", user.getId())
+                .claim("username", user.getUsername())
+                .claim("displayName", user.getDisplayName())
+                .claim("profileImage", user.getProfileImage()) // ✅ 추가!
+                .claim("authorities", authorities)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 3600000))
                 .signWith(key)
                 .compact();
+
         return jwt;
     }
 

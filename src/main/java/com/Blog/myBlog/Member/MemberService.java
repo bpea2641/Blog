@@ -16,6 +16,8 @@ public class MemberService {
         if(member.username.length() >= 2 && member.password.length() >= 2) {
             var newPassword = passwordEncoder.encode(member.password);
             member.setPassword(newPassword);
+
+            member.setProfileImage("/UserProfileImages/default.png");
             memberRepository.save(member);
         }
     }

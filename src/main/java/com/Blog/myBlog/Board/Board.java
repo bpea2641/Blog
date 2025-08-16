@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +35,9 @@ public class Board {
 
     @CreationTimestamp // 시간 자동 기입
     LocalDateTime created;
+
+    @Column
+    public String tag;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<BoardFile> files = new ArrayList<>();

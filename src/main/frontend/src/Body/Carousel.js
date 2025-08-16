@@ -23,6 +23,7 @@ function Carousel1() {
   };
 
   return (
+  <div style={{marginTop: '100px'}}>
     <Carousel interval={3000}> {/* 3초마다 자동으로 슬라이드 */}
       <Carousel.Item>
         {/* 애니메이션 데이터가 로드된 경우에만 Lottie 컴포넌트 렌더링 */}
@@ -41,6 +42,7 @@ function Carousel1() {
         )}
       </Carousel.Item>
     </Carousel>
+  </div>
   );
 }
 

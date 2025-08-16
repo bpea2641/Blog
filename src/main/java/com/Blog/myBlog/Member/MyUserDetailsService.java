@@ -28,13 +28,11 @@ public class MyUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("일반유저"));
 
-        return new CustomUser(user.getUsername(), user.getPassword(), authorities, user.getDisplayName(), user.getId());
-//        DB에서 username을 가진 유저를 찾아와서
-//        return new User(유저아이디, 비번, 권한) 해주세요
+        System.out.println("[" + username + "] 유저 권한 목록:");
+        for (GrantedAuthority authority : authorities) {
+            System.out.println("권한: " + authority.getAuthority());
+        }
 
-//        spring security가 로그인할때 DB를 찾기 위한 클래스.
-//        UsernameNotFoundException 은 해당 클래스가 위의 implements에서
-//        UserDetailsService의 형식을 따르는지 확인하는것.
-//        new User(user.getUsername(), user.getPassword(), authorities);
+        return new CustomUser(user.getUsername(), user.getPassword(), authorities, user.getDisplayName(), user.getId(), user.getProfileImage());
     }
 }

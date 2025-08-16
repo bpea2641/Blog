@@ -81,7 +81,7 @@ function BoardDetails() {
                 </Card.Body>
             </Card>
 
-            {user.username ? (
+            {user.username == board.creator ? (
                 <>
                     <Link to={`/board/edit/${id}`}>
                         <Button>수정버튼</Button>

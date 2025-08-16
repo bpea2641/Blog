@@ -13,6 +13,7 @@ public class BoardDTO {
     private String title;
     private String content; // 텍스트만 포함된 content
     private String creator;
+    private String tag;
     private List<BoardFileDTO> files; // 이미지 URL 정보는 BoardFileDTO로 관리
 
     private List<BoardDTO> boardList;
@@ -27,6 +28,7 @@ public class BoardDTO {
         this.title = board.getTitle();
         this.content = board.getContent();  // 텍스트만 저장
         this.creator = board.getCreator();
+        this.tag = board.getTag();
         this.files = board.getFiles().stream()
                 .map(file -> new BoardFileDTO(file.getFileName(), file.getFilePath(), file.getFileType()))
                 .collect(Collectors.toList());  // 파일 관련 정보 포함
@@ -38,6 +40,7 @@ public class BoardDTO {
         dto.setTitle(board.getTitle());
         dto.setContent(board.getContent());  // 텍스트만 저장
         dto.setCreator(board.getCreator());
+        dto.setTag(board.getTag());
         dto.setFiles(board.getFiles().stream()
                 .map(file -> new BoardFileDTO(file.getFileName(), file.getFilePath(), file.getFileType()))
                 .collect(Collectors.toList()));  // 파일 관련 정보 포함

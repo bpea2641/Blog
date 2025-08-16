@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from './../store';
 import axios from "axios";
@@ -7,23 +7,29 @@ import 'bootstrap-icons/font/bootstrap-icons.css'; // Bootstrap Icons 가져오�
 import { Button, Card, Form, InputGroup } from 'react-bootstrap';
 
 function Login() {
-  let user = useSelector((state) => state.user);  // Redux 상태에서 user 가져오기
-  let dispatch = useDispatch();
+//  let user = useSelector((state) => state.user);  // Redux 상태에서 user 가져오기
+//  let dispatch = useDispatch();
+
+  const [loginData, setLoginData] = useState({
+    username: '',
+    password: ''
+  });
 
   // handleChange 함수로 상태 업데이트
   const handleChange = (e) => {
     const { id, value } = e.target;
-    dispatch(setUser({ ...user, [id]: value }));  // 상태 업데이트, username과 password만 갱신
+    setLoginData({...loginData, [id]: value});
+//    dispatch(setUser({ ...user, [id]: value }));  // 상태 업데이트, username과 password만 갱신
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user);
+//    console.log(user);
     try {
-      const loginData = {
-        username: user.username,
-        password: user.password
-      };
+//      const loginData = {
+//        username: user.username,
+//        password: user.password
+//      };
 
       const response = await axios.post('/login/jwt', loginData, {
         headers: { "Content-Type": "application/json" }
@@ -54,7 +60,7 @@ function Login() {
                 <Form.Control
                   type="text"
                   id="username"
-                  value={user.username || ''}
+                  value={loginData.username || ''}
                   placeholder="이름"
                   onChange={handleChange}
                 />
@@ -64,7 +70,7 @@ function Login() {
                 <Form.Control
                   type="password"
                   id="password"
-                  value={user.password || ''}
+                  value={loginData.password || ''}
                   placeholder="비밀번호"
                   onChange={handleChange}
                 />

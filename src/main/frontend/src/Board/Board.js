@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { setBoard, setBoardDetails } from "../store";
+import { setBoard, setBoardDetails, setTag } from "../store";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css'; // Bootstrap Icons 가져오기
 import { Button, Card, Form, InputGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode"; // npm install jwt-decode 필요
+import ReactQuill from 'react-quill'; // ReactQuill을 사용
+import 'react-quill/dist/quill.snow.css'; // Quill 스타일
 
 function Board() {
     let board = useSelector((state) => ({
         title: state.board.title,
-        content: state.board.content
+        content: state.board.content,
+        tag: state.board.tag
     }));
 
     let boardList = useSelector((state) => state.board.boardList);
@@ -36,6 +39,10 @@ function Board() {
         }
     }
 
+    const handleTagChange = (newTag) => {
+        dispatch(setTag({ tag: newTag }));
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
@@ -44,6 +51,7 @@ function Board() {
         const boardData = {
             title: board.title,
             content: board.content,  // content에는 텍스트와 이미지 URL이 포함됨
+            tag: board.tag,
             creator: currentUser,
         };
     
@@ -85,55 +93,8 @@ function Board() {
 
     const userBoardList = boardList.filter(item => item.creator === currentUser);
 
-    // // 이미지 업로드 및 contentEditable에 삽입 처리
-    // const handleImageUpload = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //         setFiles((prevFiles) => [...prevFiles, file]);  // 드래그 앤 드롭된 파일을 files 배열에 추가
-    //         const reader = new FileReader();
-    //         reader.onloadend = () => {
-    //             const imageUrl = reader.result;
-    //             const newContent = `${board.content} <img src="${imageUrl}" alt="uploaded" style="max-width: 100%; margin-top: 20px;" />`;
-    //             dispatch(setBoardDetails({ ...board, content: newContent }));
-    //         };
-    //         reader.readAsDataURL(file);
-    //     }
-    // };
-
-    // 드래그 앤 드롭 이미지 삽입
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-    
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const imageUrl = reader.result;
-    
-                // 현재 커서 위치에 이미지를 삽입
-                const imageHTML = `<img src="${imageUrl}" alt="uploaded" style="max-width: 100%; margin-top: 20px;" />`;
-    
-                const contentEditable = document.getElementById("content");
-                contentEditable.focus();
-    
-                // insert the image at the current cursor position
-                document.execCommand('insertHTML', false, imageHTML);
-    
-                // board content 업데이트
-                const newContent = contentEditable.innerHTML;
-                dispatch(setBoardDetails({ ...board, content: newContent }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    
-    const handleDragOver = (e) => {
-        e.preventDefault();
-    };
-    
-
     return (
-        <div style={{ position: "relative", minHeight: "100vh", paddingLeft: "250px" }}>
+        <div style={{ position: "relative", minHeight: "100vh", paddingLeft: "100px" }}>
             {/* 왼쪽 고정 카드 */}
             <Card style={{
                 width: '15rem',
@@ -143,29 +104,46 @@ function Board() {
                 left: '20px',
                 top: '42.5%',
                 transform: 'translateY(-50%)',
-                marginTop: '24px'
+                marginTop: '72.5px'
             }}>
                 <Card.Body style={{ overflow: "auto", maxHeight: "28rem" }}>
-                    <Card.Title className="text-center mb-3">게시판</Card.Title>
+                    <Card.Title className="mb-3">내가 쓴 게시글</Card.Title>
                     {
                         userBoardList.length > 0 ? (
-                            userBoardList.map(item => (
-                                <li key={item.id}>
-                                    <Link to={`/board/detail/${item.id}`}>{item.title}</Link>
-                                </li>
-                            ))
+                            <ul style={{ listStyle: 'none', padding: 0, textAlign: 'left', marginTop: '20px' }}>
+                                {userBoardList.map(item => (
+                                    <li key={item.id} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '5px' }}>
+                                        <Link to={`/board/detail/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>{item.title}</Link>
+                                    </li>
+                                ))}
+                            </ul>
                         ) : (
-                            <p className='text-center'>게시판이 없습니다</p>
+                            <p>작성한 게시글이 없습니다.</p>
                         )
                     }
                 </Card.Body>
             </Card>
 
             {/* 중앙 정렬된 form 카드 */}
-            <div className="d-flex justify-content-center" style={{ marginTop: '28px', marginRight: '100px' }}>
+            <div className="d-flex justify-content-center" style={{ marginTop: '28px', marginLeft: '100px' }}>
                 <form onSubmit={handleSubmit}>
-                    <Card style={{ width: '80rem', height: '45rem', padding: '2rem' }}>
+                    <Card style={{ width: '70rem', height: '45rem', padding: '2rem' }}>
                         <Card.Body>
+                            {/* 태그 선택 토글 */}
+                            <div className="d-flex justify-content-start mb-3 gap-3">
+                                {['공지사항', '일반', '질문']
+                                .filter(tag => tag !== '공지사항' || (tag === '공지사항' && currentUser === 'admin'))
+                                .map((tag) => (
+                                    <Button
+                                        key={tag}
+                                        variant={board.tag === tag ? "primary" : "outline-primary"}
+                                        onClick={() => handleTagChange(tag)}
+                                    >
+                                        {tag}
+                                    </Button>
+                                ))}
+                            </div>
+
                             {/* 제목 입력 */}
                             <InputGroup className="mb-3" style={{ height: '53px' }}>
                                 <InputGroup.Text>
@@ -180,25 +158,30 @@ function Board() {
                                 />
                             </InputGroup>
 
-                            {/* 내용 입력 (contentEditable 사용) */}
-                            <InputGroup className="mb-3" style={{ marginTop: '20px', height: "33rem", flexDirection: 'column' }}>
+                            {/* ReactQuill 텍스트 편집기 */}
+                            <InputGroup className="mb-3" style={{ marginTop: '20px', height: "30rem", flexDirection: 'column' }}>
                                 <InputGroup.Text>
                                     <i className="bi bi-file-text"></i>
                                 </InputGroup.Text>
-                                <div
-                                    id="content"
-                                    contentEditable
-                                    onInput={(e) => dispatch(setBoardDetails({ ...board, content: e.target.innerHTML }))}
-                                    style={{
-                                        minHeight: '300px',
-                                        resize: 'none',
-                                        border: '1px solid #ccc',
-                                        padding: '10px',
-                                        whiteSpace: 'pre-wrap',
-                                        overflowWrap: 'break-word',
+                                <ReactQuill
+                                    value={board.content}
+                                    onChange={(content) => dispatch(setBoardDetails({ ...board, content }))}
+                                    modules={{
+                                        toolbar: [
+                                            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                            ['bold', 'italic', 'underline'],
+                                            [{ 'align': [] }],
+                                            ['link'],
+                                            [{ 'color': [] }, { 'background': [] }],
+                                            ['image'],
+                                            ['clean']
+                                        ]
                                     }}
-                                    onDrop={handleDrop}
-                                    onDragOver={handleDragOver}
+                                    style={{
+                                        height: '400px',
+                                        border: '1px solid #ccc',
+                                    }}
                                 />
                             </InputGroup>
 
