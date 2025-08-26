@@ -1,3 +1,9 @@
 runtime: java17
 instance_class: F2
 entrypoint: java -jar build/libs/myBlog-0.0.1-SNAPSHOT.jar
+
+env_variables:
+  DB_NAME: 'blog'
+  DB_USERNAME: 'Dire'
+  DB_PASSWORD: 'Bpea2641!'
+  INSTANCE_CONNECTION_NAME: 'myblog-sql'
