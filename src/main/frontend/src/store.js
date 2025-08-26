@@ -5,7 +5,7 @@ let boardData = createSlice({
     initialState : {
         title: "",
         content: "",
-        tag: "",
+        tag: "일반",
         boardList: []
     },
     reducers: {

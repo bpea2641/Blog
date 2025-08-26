@@ -53,8 +53,10 @@ public class ChatController {
         )).toList();
     }
 
-    @PostMapping("/read")
-    public ResponseEntity<?> markAsRead(@RequestParam String sender, @RequestParam String receiver) {
+    @PostMapping("/chat/read")
+    public ResponseEntity<?> markAsRead(@org.springframework.web.bind.annotation.RequestBody java.util.Map<String, String> payload) {
+        String sender = payload.get("sender");
+        String receiver = payload.get("receiver");
         chatService.markAsRead(sender, receiver);
         return ResponseEntity.ok().build();
     }

@@ -40,7 +40,7 @@ function NavToolBar() {
         user.username && { label: '마이페이지', href: '/userPage' },
         { label: '게시판 작성', href: '/board' },
         { label: '게시판 목록', href: '/board/list/page/1' },
-        { label: 'Chat', href: '/chat' }
+        user.username && { label: 'Chat', href: '/chat' }
     ].filter(Boolean); // null 제거
 
     return (
@@ -65,7 +65,7 @@ function NavToolBar() {
                       {user.username ? (
                         <>
                           <Navbar.Text>
-                            {user.displayName || user.username}님, 환영합니다. {user.authorities.map(a => a.authority).join(', ')} 권한.
+                            {user.displayName || user.username}님, 환영합니다.
                           </Navbar.Text>
                           <Button onClick={handleLogout} className="ms-2">로그아웃</Button>
                         </>

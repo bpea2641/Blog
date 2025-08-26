@@ -1,5 +1,6 @@
 package com.Blog.myBlog.AIChatBot;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,8 @@ import java.util.Map;
 @RestController
 public class AIChatController {
 
-    private final String OPENAI_APU_KEY = "";
+    @Value("${openai.api.key}")
+    private String OPENAI_API_KEY;
     private final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
     @PostMapping("/AIChat1")
@@ -34,7 +36,7 @@ public class AIChatController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(OPENAI_APU_KEY);
+        headers.setBearerAuth(OPENAI_API_KEY);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         Map response = restTemplate.postForObject(OPENAI_URL, request, Map.class);
