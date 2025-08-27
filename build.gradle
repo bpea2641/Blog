@@ -52,7 +52,6 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	implementation 'io.jsonwebtoken:jjwt-gson:0.12.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
-    implementation 'com.google.cloud:spring-cloud-gcp-starter-sql-mysql'
 }
 
 tasks.named('test') {

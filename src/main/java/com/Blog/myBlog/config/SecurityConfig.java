@@ -39,12 +39,12 @@ import com.Blog.myBlog.Member.JwtFilter;
         http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll());
         http.logout(logout -> logout.logoutUrl("/logout"));
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        http.cors(cors -> cors.configurationSource(SecuritycorsConfigurationSource()));
         return http.build();
     }
     
         @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource SecuritycorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
