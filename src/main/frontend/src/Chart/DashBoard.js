@@ -29,7 +29,7 @@ const Dashboard = () => {
     <div className="content">
       <div className="row">
         <div className="col-12">
-          <div className="card card-chart" style={{ width: "80%", margin: "0 auto", marginTop: '1200px' }}>
+          <div className="card card-chart" style={{ width: "80%", margin: "0 auto", marginTop: '200px' }}>
             <div className="card-header">
               <h5 className="card-category">블로그</h5>
               <h2 className="card-title">조회수</h2>

@@ -4,15 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.Blog.myBlog.Member.Member;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,9 +25,6 @@ public class Board {
     @Column(columnDefinition = "LONGTEXT")
     public String content;
 
-    @Column
-    public String creator;
-
     @CreationTimestamp // 시간 자동 기입
     LocalDateTime created;
 
@@ -41,6 +33,10 @@ public class Board {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<BoardFile> files = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
     
         // BoardFileDTO 반환을 위한 메소드
     public List<BoardFileDTO> getFilesAsDTO() {

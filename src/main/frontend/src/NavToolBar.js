@@ -14,33 +14,30 @@ function NavToolBar() {
     let user = useSelector((state) => state.user);
     let dispatch = useDispatch();
 
-    useEffect(() => {
-        let jwtToken = localStorage.getItem("jwt");
-
-        if(jwtToken) {
-            axios.get("/user", {
+    const handleLogout = async () => {
+        try {
+            await axios.post('/logout', {}, {
                 withCredentials: true,
-                headers: { Authorization: `Bearer ${jwtToken}` }
-            })
-            .then(response => dispatch(setUser(response.data)))
-            .catch(error => console.error(error));
+            });
+            localStorage.removeItem('jwt');
+            dispatch(resetUser());
+            window.location.href = "/";
+        } catch (error) {
+            console.error("로그아웃 중 오류 발생: ", error);
+            dispatch(resetUser());
+            window.location.href = "/";
         }
-    }, [dispatch]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("jwt");
-        dispatch(resetUser());
-        window.location.href = "/";
     };
 
     // PillNav 메뉴 아이템 구성
     const pillItems = [
-        { label: '모든 블로그', href: '/' },
-        { label: '내 블로그', href: '/' },
+        { label: '홈', href: '/' },
         user.username && { label: '마이페이지', href: '/userPage' },
         { label: '게시판 작성', href: '/board' },
         { label: '게시판 목록', href: '/board/list/page/1' },
-        user.username && { label: 'Chat', href: '/chat' }
+        user.username && { label: 'Chat', href: '/chat' },
+        { label: '코딩테스트', href: '/judge' },
+        user.username === 'admin' && { label: '문제 등록', href: '/admin/add-problem' }
     ].filter(Boolean); // null 제거
 
     return (

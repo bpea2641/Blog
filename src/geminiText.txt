@@ -1,70 +1,23 @@
-## Chart 기능 문제 분석 및 해결 방안
+# Gemini-CLI 작업 요약 및 계획 (2025-09-01)
 
-**문제 요약:**
-대시보드에서 '오늘의 방문자 수'와 '총방문자 수'가 모두 총방문자 수로 표시되는 문제입니다.
+## 오늘 완료된 작업:
 
-**원인:**
+1.  **온라인 코드 채점 시스템 1단계 목표 수립**
+    -   백엔드 API를 통해 코드 채점 로직 구현을 목표로 설정.
 
-1.  **백엔드 버그:** `VisitService.java`의 `getTodayCount()` 메소드가 오늘의 방문자 수가 아닌 전체 방문자 수를 계산하여 반환하고 있습니다.
-2.  **프론트엔드 API 호출 오류:** `DashBoard.js`에서 존재하지 않는 `/visit` API를 호출하고 있습니다. 백엔드에는 `/today`와 `/total` API가 각각 구현되어 있습니다.
+2.  **데이터베이스 모델링 (JPA Entities)**
+    -   `AIProgramConing` 패키지 내에 `Problems.java`, `TestCases.java`, `Submissions.java` 3개의 Entity 클래스 설계 및 완성.
+    -   Entity 간의 @OneToMany, @ManyToOne 관계 설정 완료.
+    -   AI 피드백 저장을 위한 `aiFeedback` 필드를 `Submissions`에 추가.
 
-**해결 방안:**
+3.  **데이터 접근 계층 구현 (JPA Repositories)**
+    -   `ProblemsRepository`, `TestCasesRepository`, `SubmissionsRepository` 3개의 JPA Repository 인터페이스 생성 완료.
 
-**1. 백엔드 `VisitService.java` 수정**
+4.  **핵심 채점 서비스 구현 (Service)**
+    -   `JudgeService.java`에 `ProcessBuilder`를 사용한 Java 코드 컴파일, 실행, 입출력 처리, 타임아웃 설정, 결과 비교 등 핵심 채점 로직 구현 완료.
 
-`getTodayCount()` 메소드를 다음과 같이 수정하여 오늘의 방문자 수만 정확히 반환하도록 변경해야 합니다.
+## 다음에 이어서 할 작업:
 
-**기존 코드:**
-```java
-public long getTodayCount() {
-    return visitRepository.findAll().stream().mapToLong(Visit::getCount).sum();
-}
-```
-
-**수정 코드:**
-```java
-public long getTodayCount() {
-    LocalDate today = LocalDate.now();
-    return visitRepository.findByDate(today).map(Visit::getCount).orElse(0L);
-}
-```
-
-**2. 프론트엔드 `DashBoard.js` 수정**
-
-`/visit` API 호출 대신, `/today`와 `/total` API를 각각 호출하여 데이터를 가져오도록 수정해야 합니다.
-
-**기존 코드:**
-```javascript
-useEffect(() => {
-    axios.get('/visit')
-        .then(response => {
-            setVisitData(response.data);
-        })
-        .catch(error => {
-            console.error('Error fetching visit data:', error);
-        });
-}, []);
-```
-
-**수정 코드 (예시):**
-```javascript
-useEffect(() => {
-    const fetchVisitData = async () => {
-        try {
-            const todayResponse = await axios.get('/today');
-            const totalResponse = await axios.get('/total');
-            // visitByDate는 별도의 API 호출이 필요할 수 있습니다.
-            // 우선 today와 total만 반영합니다.
-            setVisitData({
-                todayVisit: todayResponse.data,
-                totalVisit: totalResponse.data,
-                visitByDate: {} // 이 부분은 추가적인 구현이 필요합니다.
-            });
-        } catch (error) {
-            console.error('Error fetching visit data:', error);
-        }
-    };
-
-    fetchVisitData();
-}, []);
-```
+-   **`JudgeController.java` 생성**
+    -   **목표:** `JudgeService`를 외부(프론트엔드)에서 호출할 수 있도록 `/api/judge` 경로의 POST API 엔드포인트를 구현합니다.
+    -   **기능:** Controller는 프론트엔드로부터 문제 ID와 코드 내용을 JSON으로 받아 `judgeService.judge()` 메소드를 호출하고, 그 결과를 다시 JSON으로 반환합니다.

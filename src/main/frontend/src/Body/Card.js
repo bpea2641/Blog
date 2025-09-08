@@ -1,5 +1,6 @@
 import {Container, Card, Col, Image, Row, Button} from 'react-bootstrap';
 import { useEffect, useState } from 'react';
+import { CodeSlash, Server, Database } from 'react-bootstrap-icons';
 import SplitText from "../Component/SplitText";
 import Orb from '../Component/Orb';
 import ScrollReveal from '../Component/ScrollReveal';
@@ -92,7 +93,7 @@ function Card2() {
   }, []); // 마운트 시 한 번만 실행
 
   return (
-    <Card style={{ width: '100%', height: '50px', border: 'none', marginTop: '100px'}}>
+    <Card style={{ width: '100%', border: 'none', marginTop: '200px'}}>
       <Card.Body>
         <style>
           {`
@@ -102,6 +103,14 @@ function Card2() {
             }
             .custom-scroll-text strong {
               font-weight: 400 !important;
+            }
+            .tech-stack-btn {
+              transition: transform 0.3s ease, box-shadow 0.3s ease;
+              min-width: 180px; /* 아이콘 추가에 따른 최소 너비 설정 */
+            }
+            .tech-stack-btn:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             }
           `}
         </style>
@@ -124,9 +133,15 @@ function Card2() {
         </div>
         <Card.Title style={{ fontSize: '3rem', marginTop: '130px'}}>무슨 기술이 쓰였나요?</Card.Title>
         <div className="d-flex justify-content-center mb-4" style={{ gap: '20rem', marginTop: '35px' }}>
-          <Button variant={selectedCategory === 'Front' ? 'primary' : 'outline-primary'} onClick={() => setSelectedCategory('Front')} className="mx-4">Front</Button>
-          <Button variant={selectedCategory === 'Back' ? 'primary' : 'outline-primary'} onClick={() => setSelectedCategory('Back')} className="mx-4">Back</Button>
-          <Button variant={selectedCategory === 'Database' ? 'primary' : 'outline-primary'} onClick={() => setSelectedCategory('Database')} className="mx-4">Database</Button>
+          <Button variant={selectedCategory === 'Front' ? 'primary' : 'outline-primary'} onClick={() => setSelectedCategory('Front')} className="mx-4 tech-stack-btn d-flex align-items-center justify-content-center">
+            <CodeSlash className="me-2" /> Front
+          </Button>
+          <Button variant={selectedCategory === 'Back' ? 'primary' : 'outline-primary'} onClick={() => setSelectedCategory('Back')} className="mx-4 tech-stack-btn d-flex align-items-center justify-content-center">
+            <Server className="me-2" /> Back
+          </Button>
+          <Button variant={selectedCategory === 'Database' ? 'primary' : 'outline-primary'} onClick={() => setSelectedCategory('Database')} className="mx-4 tech-stack-btn d-flex align-items-center justify-content-center">
+            <Database className="me-2" /> Database
+          </Button>
         </div>
         {selectedCategory === 'Front' && (
           <Container>

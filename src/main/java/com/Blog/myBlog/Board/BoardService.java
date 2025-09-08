@@ -23,13 +23,6 @@ public class BoardService {
     private final String UPLOAD_DIR = "C:\\uploads";  // 파일이 저장될 경로
 
     public void saveBoard(Board board, MultipartFile[] files) {
-        // 사용자 인증 정보 가져오기
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && ((org.springframework.security.core.Authentication) auth).isAuthenticated()) {
-            String username = auth.getName();
-            board.setCreator(username);  // 게시글 작성자 정보 설정
-        }
-    
         // 게시판 저장
         boardRepository.save(board);
     

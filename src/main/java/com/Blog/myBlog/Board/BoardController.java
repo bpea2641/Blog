@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.Blog.myBlog.Member.Member;
+import com.Blog.myBlog.Member.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class BoardController {
     private final BoardService boardService;
     private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository; // MemberRepository 주입
 
     @PostMapping(value = "/board/save")
     public ResponseEntity<?> saveBoard(
@@ -39,11 +42,15 @@ public class BoardController {
             ObjectMapper mapper = new ObjectMapper();
             BoardDTO boardDTO = mapper.readValue(boardDataString, BoardDTO.class);
 
+            // creatorId로 Member 조회
+            Member member = memberRepository.findById(boardDTO.getCreatorId())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
             // Board 객체 생성
             Board board = new Board();
             board.setTitle(boardDTO.getTitle());
-            board.setContent(boardDTO.getContent());  // content에는 텍스트와 이미지 URL이 포함됨
-            board.setCreator(boardDTO.getCreator());
+            board.setContent(boardDTO.getContent());
+            board.setMember(member); // Member 설정
             board.setTag(boardDTO.getTag());
 
             // 게시글과 파일을 저장하는 서비스 호출
@@ -70,10 +77,9 @@ public class BoardController {
             Board board = boardRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
             
-            // BoardDTO에서 데이터를 가져와 Board 객체 수정
+            // BoardDTO에서 데이터를 가져와 Board 객체 수정 (creator는 수정하지 않음)
             board.setTitle(boardDTO.getTitle());
-            board.setContent(boardDTO.getContent());  // content에는 텍스트와 이미지 URL이 포함됨
-            board.setCreator(boardDTO.getCreator());
+            board.setContent(boardDTO.getContent());
     
             // 게시글 수정 및 파일 업로드 처리
             boardService.saveBoard(board, files);

@@ -76,9 +76,6 @@ function OCV() {
                   <Button className="mb-4" variant={mode === 'general' ? 'primary' : 'outline-primary'} onClick={() => setMode('general')}>
                     일반 챗
                   </Button>
-                  <Button variant={mode === 'blog' ? 'primary' : 'outline-primary'} onClick={() => setMode('blog')}>
-                    블로그 챗
-                  </Button>
                 </ButtonGroup>
               </Col>
 

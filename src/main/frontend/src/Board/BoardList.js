@@ -94,7 +94,7 @@ function BoardList() {
                                             {item.title}
                                         </Link>
                                     </div>
-                                    <span className="badge bg-secondary ms-auto">작성자: {item.creator}</span>
+                                    <span className="badge bg-secondary ms-auto">작성자: {item.creatorName}</span>
                                 </li>
                             ))
                         ) : (

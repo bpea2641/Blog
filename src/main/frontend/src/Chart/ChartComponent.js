@@ -27,28 +27,32 @@ const ChartComponent = ({today, total}) => {
       })
       .then((data) => {
         const labels = Object.keys(data);
-        const values = Object.values(data);
+        const weeklyValues = Object.values(data);
+
+        // Create arrays for today and total with the same length as labels
+        const todayValues = new Array(labels.length).fill(today);
+        const totalValues = new Array(labels.length).fill(total);
   
         setChartData({
           labels,
           datasets: [
             {
               label: "일주일 간 조회수",
-              data: values,
+              data: weeklyValues,
               borderColor: "rgba(75,192,192,1)",
               backgroundColor: "rgba(75,192,192,0.2)",
               fill: false,
             },
             {
               label: "오늘 조회수",
-              data: [today],
+              data: todayValues,
               borderColor: "rgba(255, 99, 132, 1)",
               backgroundColor: "rgba(255, 99, 132, 0.2)",
               fill: false,
             },
             {
               label: "총 조회수",
-              data: [total],
+              data: totalValues,
               borderColor: "rgba(54, 162, 235, 1)",
               backgroundColor: "rgba(54, 162, 235, 0.2)",
               fill: false,

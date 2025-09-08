@@ -10,7 +10,8 @@ import com.Blog.myBlog.Member.Member;
 @Entity
 @Data
 public class Chat {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

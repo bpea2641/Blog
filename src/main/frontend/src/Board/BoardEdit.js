@@ -4,6 +4,8 @@ import { setBoardDetails } from "../store";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { Button, Card, Form, InputGroup } from 'react-bootstrap';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function BoardEdit() {
     const { id } = useParams(); // URL에서 게시글 ID 가져오기
@@ -21,9 +23,12 @@ function BoardEdit() {
             });
     }, [dispatch, id]);
 
-    const handleChange = (e) => {
-        const { id, value } = e.target;
-        dispatch(setBoardDetails({ ...board, [id]: value }));
+    const handleTitleChange = (e) => {
+        dispatch(setBoardDetails({ ...board, title: e.target.value }));
+    };
+
+    const handleContentChange = (content) => {
+        dispatch(setBoardDetails({ ...board, content }));
     };
 
     const handleSubmit = async (e) => {
@@ -50,15 +55,22 @@ function BoardEdit() {
         }
     };
 
-    const handleInput = (e) => {
-        // 텍스트 입력이 끝난 후에 상태를 업데이트
-        dispatch(setBoardDetails({ ...board, content: e.target.innerHTML }));
+    const modules = {
+        toolbar: [
+            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['bold', 'italic', 'underline'],
+            [{ 'align': [] }],
+            ['link', 'image', 'code-block'],
+            [{ 'color': [] }, { 'background': [] }],
+            ['clean']
+        ]
     };
 
     return (
         <div className="d-flex justify-content-center mt-5">
             <form onSubmit={handleSubmit}>
-                <Card style={{ width: '50rem', padding: '2rem' }}>
+                <Card style={{ width: '70rem', padding: '2rem' }}>
                     <Card.Body>
                         <InputGroup className="mb-3">
                             <InputGroup.Text>제목</InputGroup.Text>
@@ -66,34 +78,20 @@ function BoardEdit() {
                                 type="text"
                                 id="title"
                                 value={board.title || ""}
-                                onChange={handleChange}
+                                onChange={handleTitleChange}
                             />
                         </InputGroup>
-                        <InputGroup className="mb-3">
-                            <InputGroup.Text>내용</InputGroup.Text>
-                            <div
-                                id="content"
-                                contentEditable
-                                onBlur={handleInput} // onInput 대신 onBlur 사용
-                                dangerouslySetInnerHTML={{ __html: board.content || "" }}
-                                style={{
-                                    width: '100%',
-                                    minHeight: '300px',
-                                    resize: 'none',
-                                    border: '1px solid #ccc',
-                                    padding: '10px',
-                                    whiteSpace: 'pre-wrap', // 공백 및 줄 바꿈 처리
-                                    overflowWrap: 'break-word',
-                                    wordWrap: 'break-word',
-                                    boxSizing: 'border-box',
-                                    overflow: 'auto',
-                                    textAlign: 'left', // 왼쪽 정렬
-                                    lineHeight: '1.6', // 행간 조정
-                                    display: 'block',
-                                    direction: 'ltr', // 왼쪽에서 오른쪽으로 텍스트 방향 설정
-                                }}
-                            />
-                        </InputGroup>
+                        
+                        <ReactQuill
+                            value={board.content || ''}
+                            onChange={handleContentChange}
+                            modules={modules}
+                            style={{
+                                height: '400px',
+                                marginBottom: '4rem'
+                            }}
+                        />
+
                         <div className="text-center">
                             <Button type="submit">수정 완료</Button>
                         </div>

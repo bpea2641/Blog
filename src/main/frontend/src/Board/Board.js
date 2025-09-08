@@ -28,12 +28,14 @@ function Board() {
 
     // JWT 토큰 가져오기
     const token = localStorage.getItem("jwt");
-    let currentUser = null;
+    let currentUserId = null;
+    let currentUserUsername = null;
 
     if (token) {
         try {
             const decoded = jwtDecode(token);
-            currentUser = decoded.username; // 백엔드에서 username이 어떤 필드인지 확인 필요
+            currentUserId = decoded.id;
+            currentUserUsername = decoded.username;
         } catch (error) {
             console.error("토큰 디코딩 오류:", error);
         }
@@ -52,7 +54,7 @@ function Board() {
             title: board.title,
             content: board.content,  // content에는 텍스트와 이미지 URL이 포함됨
             tag: board.tag,
-            creator: currentUser,
+            creatorId: currentUserId, // creator 대신 creatorId를 사용
         };
     
         formData.append("boardData", JSON.stringify(boardData));  // JSON 데이터를 boardData로 추가
@@ -91,7 +93,7 @@ function Board() {
             });
     }, [dispatch]);
 
-    const userBoardList = boardList.filter(item => item.creator === currentUser);
+    const userBoardList = boardList.filter(item => item.creatorId === currentUserId);
 
     return (
         <div style={{ position: "relative", minHeight: "100vh", paddingLeft: "100px" }}>
@@ -132,7 +134,7 @@ function Board() {
                             {/* 태그 선택 토글 */}
                             <div className="d-flex justify-content-start mb-3 gap-3">
                                 {['공지사항', '일반', '질문']
-                                .filter(tag => tag !== '공지사항' || (tag === '공지사항' && currentUser === 'admin'))
+                                .filter(tag => tag !== '공지사항' || (tag === '공지사항' && currentUserUsername === 'admin'))
                                 .map((tag) => (
                                     <Button
                                         key={tag}
@@ -172,7 +174,7 @@ function Board() {
                                             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                                             ['bold', 'italic', 'underline'],
                                             [{ 'align': [] }],
-                                            ['link'],
+                                            ['link', 'image', 'code-block'],
                                             [{ 'color': [] }, { 'background': [] }],
                                             ['image'],
                                             ['clean']

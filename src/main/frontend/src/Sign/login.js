@@ -50,7 +50,7 @@ function Login() {
     <div>
       <form onSubmit={handleSubmit}>
         <div className="d-flex justify-content-center" style={{ marginTop: '70px', marginBottom: '100px' }}>
-          <Card style={{ width: '35rem', height: '33rem', padding: '2rem' }}>
+          <Card style={{ width: '35rem', height: '38rem', padding: '2rem' }}>
             <Card.Body>
               <Card.Title className="text-center mb-3">로그인</Card.Title>
               <InputGroup className="mb-3" style={{height: '53px', marginTop: '31px'}}>
@@ -78,6 +78,24 @@ function Login() {
               <div className="text-center">
                 <Button type="submit" style={{width: '460px', height: '45px'}}>로그인</Button>
                 <Card.Text style={{marginTop: '10px'}}>or 소셜 로그인</Card.Text>
+                <a href="https://kauth.kakao.com/oauth/authorize?client_id=e554c2b5f8505dce455d5244cf0b62fe&redirect_uri=http://localhost:8080/login/oauth2/code/kakao&response_type=code" style={{ textDecoration: 'none' }}>
+                  <div style={{
+                    backgroundColor: '#FEE500',
+                    color: '#191919',
+                    width: '460px',
+                    height: '45px',
+                    margin: 'auto',
+                    marginTop: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '6px',
+                    fontWeight: 'bold',
+                  }}>
+                    <i className="bi bi-chat-fill" style={{marginRight: '8px'}}></i>
+                    카카오 로그인
+                  </div>
+                </a>
               </div>
             </Card.Body>
           </Card>

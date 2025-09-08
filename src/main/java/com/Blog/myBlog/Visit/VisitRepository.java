@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface VisitRepository extends JpaRepository<Visit, Long> {
     Optional<Visit> findByDate(LocalDate date);
 
-    @Query("SELECT SUM(v.count) FROM Visit v")
+    @Query("SELECT COALESCE(SUM(v.count), 0) FROM Visit v")
     Long getDateCount();
+
 }

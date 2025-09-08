@@ -13,8 +13,9 @@
     import org.springframework.web.cors.CorsConfigurationSource;
     import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
     import java.util.Arrays;
+    import java.util.List;
 
-import com.Blog.myBlog.Member.JwtFilter;
+    import com.Blog.myBlog.Member.JwtFilter;
 
     @Configuration
     @EnableWebSecurity
@@ -36,18 +37,18 @@ import com.Blog.myBlog.Member.JwtFilter;
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(new JwtFilter(), ExceptionTranslationFilter.class);
-        http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll());
-        http.logout(logout -> logout.logoutUrl("/logout"));
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll());
+        http.logout(logout -> logout.disable()); // ✅ 기본 로그아웃 비활성화
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         http.cors(cors -> cors.configurationSource(SecuritycorsConfigurationSource()));
         return http.build();
     }
-    
-        @Bean
+
+    @Bean
     public CorsConfigurationSource SecuritycorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOriginPatterns(List.of("https://*.run.app", "http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

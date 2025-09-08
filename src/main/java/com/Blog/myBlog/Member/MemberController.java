@@ -8,7 +8,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -75,10 +77,15 @@ public class MemberController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutJwt(HttpServletResponse response) {
-        Cookie cookie = new Cookie("jwt", null);
-        cookie.setMaxAge(0);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
+        ResponseCookie cookie = ResponseCookie.from("jwt", null)
+                .path("/")
+                .maxAge(0) // 즉시 만료
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok("로그아웃 완료");
     }
     
